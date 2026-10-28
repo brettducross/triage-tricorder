@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#060b14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Tricorder MD" />
+  <title>Home Triage Tricorder — AI Smartphone Physical Exam Suite</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="pupilFlashOverlay" class="pupil-flash-overlay"></div>
+
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="brand-row">
+        <img src="./icons/icon.svg" alt="Tricorder Logo" class="brand-icon" />
+        <div>
+          <div class="brand-title">
+            Home Triage Tricorder
+            <span class="badge-mvp">PWA + Native Bridge v1</span>
+          </div>
+          <div class="brand-subtitle">Multi-Sensor Smartphone Physical Exam &amp; Dynamic Clinical Triage</div>
+        </div>
+      </div>
+
+      <div class="sim-toggle-wrap" title="Toggle between Live Hardware Sensors and Physiological Demo Waveforms for instant desktop/mobile testing">
+        <span class="sim-toggle-label" id="signalModeLabel">Signal: Hybrid Live + Sim Fallback</span>
+        <button id="simModeToggle" class="switch-btn active" type="button" aria-label="Toggle Demo Signal">
+          <span class="switch-ReadThumb"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hardware Sensor Status Bar -->
+    <div id="sensorStatusBar" class="sensor-status-bar"></div>
+
+    <!-- Primary Navigation -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="nav-tab active" data-tab="home" type="button">
+        <span>🏠 Home &amp; Baseline</span>
+      </button>
+      <button class="nav-tab" data-tab="checkup" type="button">
+        <span>⚡ 60s Checkup Scan</span>
+      </button>
+      <button class="nav-tab" data-tab="triage" type="button">
+        <span>🩺 Symptom Triage</span>
+      </button>
+      <button class="nav-tab" data-tab="toolbox" type="button">
+        <span>🧰 Doctor's Black Bag</span>
+      </button>
+      <button class="nav-tab" data-tab="native" type="button">
+        <span>📱 History &amp; Native Bridge</span>
+      </button>
+    </nav>
+
+    <!-- Main Dynamic View Root -->
+    <main id="appRoot"></main>
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

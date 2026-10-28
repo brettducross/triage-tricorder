@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#060b14" />
+  <title>Home Triage Tricorder — Multi-Sensor Smartphone Physical Exam & Pre-Visit Triage Studio</title>
+  <meta name="description" content="Turn any smartphone into a multi-sensor physical exam & pre-visit clinical triage studio with zero extra hardware. Camera rPPG, raw mic auscultation, 6-axis IMU SCG & tremor, 240Hz touch neuro, and Weber audiometry." />
+  <link rel="icon" type="image/svg+xml" href="./app/icons/icon.svg" />
+  <style>
+    :root {
+      --bg-deep: #040811;
+      --bg-primary: #060b14;
+      --bg-elevated: #0c1424;
+      --bg-card: #101b30;
+      --bg-card-hover: #14223d;
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-accent: rgba(0, 242, 254, 0.42);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --cyan: #00f2fe;
+      --sky: #0ea5e9;
+      --teal: #14b8a6;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --violet: #8b5cf6;
+      --radius-xl: 20px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      background-image:
+        radial-gradient(circle at 15% 8%, rgba(0, 242, 254, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 22%, rgba(16, 185, 129, 0.07) 0%, transparent 45%),
+        linear-gradient(180deg, #040811 0%, #060b14 100%);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Sticky Top Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(6, 11, 20, 0.86);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(16, 185, 129, 0.2));
+      border: 1px solid var(--border-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 18px rgba(0, 242, 254, 0.2);
+      font-size: 1.25rem;
+    }
+
+    .brand-tag {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0, 242, 254, 0.14);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan), var(--sky));
+      color: #030712;
+      font-weight: 700;
+      box-shadow: 0 8px 25px rgba(0, 242, 254, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(0, 242, 254, 0.38);
+    }
+
+    .btn-secondary {
+      background: rgba(16, 27, 48, 0.9);
+      color: var(--text-primary);
+      border: 1px solid var(--border-accent);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(20, 34, 61, 1);
+      border-color: var(--cyan);
+    }
+
+    .btn-emerald {
+      background: linear-gradient(135deg, var(--emerald), var(--teal));
+      color: #030712;
+      font-weight: 700;
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-outline {
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-outline:hover {
+      color: var(--text-primary);
+      border-color: rgba(148, 163, 184, 0.35);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 68px 0 56px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      margin-bottom: 22px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 10px var(--emerald);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.1rem, 4.3vw, 3.55rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      max-width: 980px;
+      margin: 0 auto 20px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #00f2fe 0%, #38bdf8 45%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 1.14rem;
+      color: var(--text-secondary);
+      max-width: 790px;
+      margin: 0 auto 28px;
+    }
+
+    .sensor-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .sensor-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: rgba(16, 27, 48, 0.85);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      color: #e2e8f0;
+    }
+
+    .sensor-badge span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+    }
+
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 42px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+      background: rgba(12, 20, 36, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+    }
+
+    .stat-box {
+      text-align: center;
+      padding: 6px;
+    }
+
+    .stat-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+    }
+
+    .stat-lbl {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Section Headings */
+    section {
+      padding: 64px 0;
+      border-top: 1px solid rgba(148, 163, 184, 0.08);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 44px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid rgba(0, 242, 254, 0.28);
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(1.65rem, 3vw, 2.35rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-header p {
+      color: var(--text-secondary);
+      font-size: 1.02rem;
+    }
+
+    /* Market Gap Comparison Table */
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    table.comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    table.comp-table th,
+    table.comp-table td {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    table.comp-table th {
+      background: rgba(16, 27, 48, 0.95);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    table.comp-table th.highlight-col,
+    table.comp-table td.highlight-col {
+      background: rgba(0, 242, 254, 0.07);
+      border-left: 1px solid rgba(0, 242, 254, 0.3);
+      border-right: 1px solid rgba(0, 242, 254, 0.3);
+    }
+
+    .check-yes {
+      color: var(--emerald);
+      font-weight: 700;
+    }
+
+    .check-no {
+      color: var(--rose);
+      font-weight: 600;
+    }
+
+    .check-partial {
+      color: var(--amber);
+      font-weight: 600;
+    }
+
+    /* Live Interactive App Embed Frame */
+    .embed-showcase {
+      display: grid;
+      grid-template-columns: 1fr 440px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .device-frame {
+      background: #080f1e;
+      border: 2px solid rgba(0, 242, 254, 0.4);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 70px rgba(0, 242, 254, 0.14);
+    }
+
+    .device-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: #0c1629;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .window-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .app-iframe {
+      width: 100%;
+      height: 720px;
+      border: none;
+      display: block;
+      background: #060b14;
+    }
+
+    .embed-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .side-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+    }
+
+    .side-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .side-card p {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+
+    .step-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.86rem;
+    }
+
+    .step-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(6, 11, 20, 0.65);
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .step-num {
+      background: rgba(0, 242, 254, 0.16);
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Core Modes + 5 Labs Grid */
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+      margin-bottom: 32px;
+    }
+
+    .mode-card {
+      background: linear-gradient(180deg, rgba(16, 27, 48, 0.95), rgba(12, 20, 36, 0.95));
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+    }
+
+    .mode-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(0, 242, 254, 0.15);
+      color: var(--cyan);
+      margin-bottom: 10px;
+    }
+
+    .mode-card h3 {
+      font-size: 1.35rem;
+      margin-bottom: 10px;
+    }
+
+    .mode-card p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      margin-bottom: 16px;
+    }
+
+    .labs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .lab-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .lab-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-accent);
+    }
+
+    .lab-icon {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+
+    .lab-card h4 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+
+    .lab-card p {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .lab-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .metric-chip {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(6, 11, 20, 0.8);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    /* Sample Doctor Handoff PDF Preview */
+    .pdf-preview-shell {
+      background: #0b1322;
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .pdf-sheet {
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 920px;
+      margin: 0 auto;
+      font-family: "Inter", -apple-system, sans-serif;
+    }
+
+    .pdf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .pdf-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .pdf-sub {
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    .pdf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .pdf-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      background: #f8fafc;
+    }
+
+    .pdf-box-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #475569;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .pdf-box-val {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0f172a;
+      font-family: var(--font-mono);
+    }
+
+    .pdf-box-note {
+      font-size: 0.75rem;
+      color: #059669;
+      font-weight: 600;
+    }
+
+    /* Two-Track Pricing Grid */
+    .pricing-track-label {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+      margin-bottom: 40px;
+    }
+
+    .pricing-grid-b2b {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .price-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .price-card.featured {
+      border: 2px solid var(--cyan);
+      background: linear-gradient(180deg, rgba(16, 27, 48, 0.98), rgba(10, 19, 36, 0.98));
+      box-shadow: 0 20px 50px rgba(0, 242, 254, 0.12);
+    }
+
+    .popular-pill {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: linear-gradient(90deg, var(--cyan), var(--emerald));
+      color: #030712;
+      font-size: 0.7rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      padding: 3px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .price-tier {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .price-amount {
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      margin-bottom: 6px;
+    }
+
+    .price-amount span {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .price-desc {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.88rem;
+      margin-bottom: 24px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      color: var(--emerald);
+      font-weight: 800;
+    }
+
+    /* Footer & Safe Harbor */
+    .footer {
+      background: #03060c;
+      border-top: 1px solid var(--border-subtle);
+      padding: 56px 0 40px;
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+    }
+
+    .safe-harbor-box {
+      background: rgba(16, 27, 48, 0.7);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 28px;
+    }
+
+    .emergency-strip {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      color: #fda4af;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      margin-bottom: 28px;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero-stats,
+      .embed-showcase,
+      .modes-grid,
+      .labs-grid,
+      .pricing-grid,
+      .pricing-grid-b2b,
+      .pdf-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <div class="brand-logo">🩺</div>
+        <span>Home Triage Tricorder</span>
+        <span class="brand-tag">v1.0 Live</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#market-gap">Why It Exists</a>
+        <a href="#live-demo">Interactive App</a>
+        <a href="#black-bag">5 Sensor Labs</a>
+        <a href="#handoff-pdf">Doctor Handoff PDF</a>
+        <a href="#pricing">B2C &amp; Clinic Pricing</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="./Home_Triage_Tricorder_App.html" download="Home_Triage_Tricorder_App.html" class="btn btn-outline">⬇ Offline HTML (113 KB)</a>
+        <a href="./app/index.html" class="btn btn-primary">⚡ Launch Full Web App</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" style="border-top: none;">
+    <div class="container">
+      <div class="hero-eyebrow">
+        <span class="pulse-dot"></span>
+        <span>100% SOFTWARE ON STOCK SMARTPHONES · ON-DEVICE PRIVACY · ZERO EXTRA HARDWARE</span>
+      </div>
+      <h1>
+        Turn Any Smartphone Into a <span class="gradient-text">Multi-Sensor Physical Exam</span> &amp; Pre-Visit Clinical Triage Studio
+      </h1>
+      <p class="hero-sub">
+        Text chatbots are blind and deaf to your physiology, and hardware exam kits cost $299. Home Triage Tricorder unlocks your phone's optical camera, raw unfiltered microphone, 6-axis IMU accelerometer, 240Hz touch digitizer, and bone-conduction audio to establish your personal 60-second baseline and generate a 1-page Doctor Handoff PDF.
+      </p>
+
+      <div class="sensor-badges">
+        <div class="sensor-badge"><span class="dot"></span> Camera Green-Channel rPPG &amp; CIE Lab</div>
+        <div class="sensor-badge"><span class="dot"></span> Raw Mic Auscultation (20–1200 Hz)</div>
+        <div class="sensor-badge"><span class="dot"></span> 6-Axis IMU SCG, Tremor FFT &amp; Romberg</div>
+        <div class="sensor-badge"><span class="dot"></span> 240Hz Archimedes Spiral &amp; Flicker Fusion</div>
+        <div class="sensor-badge"><span class="dot"></span> Pure-Tone &amp; Weber Bone-Conduction Triage</div>
+      </div>
+
+      <div class="hero-ctas">
+        <a href="./app/index.html" class="btn btn-primary">⚡ Launch Live Web App (60s Scan)</a>
+        <a href="#live-demo" class="btn btn-secondary">📱 Try Embedded Interactive Demo</a>
+        <a href="#pricing-b2b" class="btn btn-emerald">🏥 For Telehealth &amp; DPC Clinics (B2B)</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-box">
+          <div class="stat-val">$0</div>
+          <div class="stat-lbl">Extra Hardware Required</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">60 Sec</div>
+          <div class="stat-lbl">5-Stage Head-to-Toe Baseline</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">5 Labs</div>
+          <div class="stat-lbl">Optical, Audio, IMU, Touch &amp; Hearing</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">100% Local</div>
+          <div class="stat-lbl">On-Device WebRTC / WebAudio DSP</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Market Gap Comparison Section -->
+  <section id="market-gap">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">The Market Gap</span>
+        <h2>Why Telehealth &amp; Home Triage Needed a New Category</h2>
+        <p>Existing solutions force patients and clinicians to choose between sensor-blind chatbots, passive selfie-only SDKs, or expensive $300 hardware peripherals.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Capability / Feature</th>
+              <th>Text AI Symptom Checkers<br><span style="font-size:0.78rem;color:var(--text-secondary);font-weight:400;">(Ada Health, K Health, Buoy)</span></th>
+              <th>Selfie-Only rPPG SDKs<br><span style="font-size:0.78rem;color:var(--text-secondary);font-weight:400;">(Binah.ai, Anura)</span></th>
+              <th>Hardware Home Exam Kits<br><span style="font-size:0.78rem;color:var(--text-secondary);font-weight:400;">(TytoCare, Withings BeamO)</span></th>
+              <th class="highlight-col">🩺 Home Triage Tricorder<br><span style="font-size:0.78rem;color:var(--cyan);font-weight:600;">(PWA + iOS/Android Native Bridge)</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Hardware Cost to Patient</strong></td>
+              <td>$0 (Phone only)</td>
+              <td>$0 (Phone only)</td>
+              <td class="check-no">$250 – $300 Device Purchase</td>
+              <td class="highlight-col check-yes">$0 — Runs on Any Smartphone</td>
+            </tr>
+            <tr>
+              <td><strong>Camera Optical rPPG Vitals (HR, HRV, Resp)</strong></td>
+              <td class="check-no">✕ Blind to camera</td>
+              <td class="check-yes">✓ Passive face only</td>
+              <td class="check-yes">✓ Dedicated SpO2/ECG sensor</td>
+              <td class="highlight-col check-yes">✓ Green-Channel rPPG + CIE Lab Tissue Colorimetry</td>
+            </tr>
+            <tr>
+              <td><strong>Raw Mic Auscultation &amp; Vocal Biomarkers</strong></td>
+              <td class="check-no">✕ Deaf to microphone</td>
+              <td class="check-no">✕ None</td>
+              <td class="check-partial">Stethoscope only (no voice DSP)</td>
+              <td class="highlight-col check-yes">✓ Heart/Lung/Bowel Bands + Vocal Jitter/Shimmer/HNR</td>
+            </tr>
+            <tr>
+              <td><strong>6-Axis IMU Neuromotor &amp; Cardio SCG</strong></td>
+              <td class="check-no">✕ None</td>
+              <td class="check-no">✕ None</td>
+              <td class="check-no">✕ No tremor or Romberg balance</td>
+              <td class="highlight-col check-yes">✓ Chest SCG, 4–12Hz Tremor FFT &amp; 2D Romberg Stabilogram</td>
+            </tr>
+            <tr>
+              <td><strong>240Hz Touch Neuro &amp; Weber Audiometry</strong></td>
+              <td class="check-no">✕ None</td>
+              <td class="check-no">✕ None</td>
+              <td class="check-partial">Visual otoscope only</td>
+              <td class="highlight-col check-yes">✓ Archimedes Spiral, Tap Test &amp; Weber Bone Lateralization</td>
+            </tr>
+            <tr>
+              <td><strong>Dynamic Symptom Triage + 1-Page Doctor PDF</strong></td>
+              <td class="check-partial">Text summary only</td>
+              <td class="check-no">✕ Raw numbers only</td>
+              <td class="check-partial">Proprietary walled garden</td>
+              <td class="highlight-col check-yes">✓ Red-Flag Gate + 2–4 Targeted Exams + Printable PDF</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Live App Embed Section -->
+  <section id="live-demo">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Interactive Product Studio</span>
+        <h2>Try the Working Home Triage Tricorder Right Here</h2>
+        <p>Test all 5 stages of the 60-Second Checkup Scan, run dynamic symptom triage, or open the Doctor's Black Bag labs directly inside the live embedded app below.</p>
+      </div>
+
+      <div class="embed-showcase">
+        <div class="device-frame">
+          <div class="device-topbar">
+            <div class="window-dots">
+              <span style="background:#f43f5e;"></span>
+              <span style="background:#f59e0b;"></span>
+              <span style="background:#10b981;"></span>
+            </div>
+            <span>LIVE SANDBOX · /app/index.html (Hybrid Hardware + Sim Fallback)</span>
+            <a href="./app/index.html" target="_blank" style="color:var(--cyan);font-weight:700;">Open Full Screen ↗</a>
+          </div>
+          <iframe src="./app/index.html" class="app-iframe" title="Home Triage Tricorder Live Interactive App" allow="camera; microphone; accelerometer; gyroscope"></iframe>
+        </div>
+
+        <div class="embed-sidebar">
+          <div class="side-card">
+            <h3>⚡ Instant Test Drive Guide</h3>
+            <p>The embedded app runs in <strong>Hybrid Live + Simulated Fallback</strong> mode so you can test every clinical workflow immediately on desktop or mobile:</p>
+            <ul class="step-list">
+              <li>
+                <span class="step-num">01</span>
+                <div><strong>Run the 60s Checkup Scan:</strong> Click <em>"60s Checkup Scan"</em> to step through Face rPPG, Close-Up Eyes, Tongue &amp; Voice, Hand Tremor, and Romberg Balance, then click <strong>Save as Personal Baseline</strong>.</div>
+              </li>
+              <li>
+                <span class="step-num">02</span>
+                <div><strong>Test "Something's Bothering Me":</strong> Select a clinical preset (e.g., <em>Shortness of Breath / Cough</em> or <em>Dizziness / Tremor</em>), clear the Step-1 Emergency Gate, and generate the <strong>1-Tap Doctor Handoff PDF</strong>.</div>
+              </li>
+              <li>
+                <span class="step-num">03</span>
+                <div><strong>Draw the Archimedes Spiral:</strong> Open <em>"Doctor's Black Bag"</em> → <strong>240Hz Touch &amp; Display Neuro Lab</strong> and trace the spiral with your mouse or finger for live RMS tremor scoring.</div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="side-card">
+            <h3>📦 Deploy &amp; Offline Bundles</h3>
+            <p>Need to run completely offline in rural clinics or share a single self-contained file?</p>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <a href="./app/index.html" class="btn btn-primary" style="width:100%;">🚀 Launch Full-Screen PWA (/app/)</a>
+              <a href="./Home_Triage_Tricorder_App.html" download="Home_Triage_Tricorder_App.html" class="btn btn-secondary" style="width:100%;">⬇ Download Single-File Bundle (113 KB)</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Two Core Modes + 5 Sensor Labs -->
+  <section id="black-bag">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Clinical Architecture</span>
+        <h2>Two Guided Patient Flows + Five "Doctor's Black Bag" Sensor Labs</h2>
+        <p>Designed around longitudinal personal baselines rather than noisy single-point snapshots—tracking how your body drifts from your own healthy reference.</p>
+      </div>
+
+      <div class="modes-grid">
+        <div class="mode-card">
+          <span class="mode-badge">Mode 1 · Proactive Baseline</span>
+          <h3>⚡ 60-Second General Checkup Scan</h3>
+          <p>A guided 5-stage head-to-toe checkup when you feel healthy. Captures 12+ optical, acoustic, and neuromuscular parameters in 60 seconds and computes your <strong>% Physiological Drift</strong> over time.</p>
+          <div class="lab-metrics">
+            <span class="metric-chip">1. Face rPPG (0–15s)</span>
+            <span class="metric-chip">2. Eyelid &amp; Sclera (15–25s)</span>
+            <span class="metric-chip">3. Tongue &amp; "Ahhh" Voice (25–35s)</span>
+            <span class="metric-chip">4. Capillary &amp; Tremor (35–45s)</span>
+            <span class="metric-chip">5. Romberg Balance (45–60s)</span>
+          </div>
+        </div>
+
+        <div class="mode-card">
+          <span class="mode-badge">Mode 2 · Pre-Visit Intake</span>
+          <h3>🩺 "Something's Bothering Me" Dynamic Triage</h3>
+          <p>Free-text symptom matcher + 7 clinical presets. Starts with a mandatory Step-1 Red-Flag Emergency Gate, queues <strong>only the 2–4 relevant phone sensor exams</strong>, and exports a structured 1-page Doctor Handoff PDF.</p>
+          <div class="lab-metrics">
+            <span class="metric-chip">Step 1: Red-Flag Emergency Gate</span>
+            <span class="metric-chip">Step 2: Targeted 2–4 Sensor Queue</span>
+            <span class="metric-chip">Step 3: 1-Tap Printable Doctor PDF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="labs-grid">
+        <div class="lab-card">
+          <div class="lab-icon">👁️</div>
+          <h4>1. Optical Vitals &amp; CIE Lab Colorimetry</h4>
+          <p>WebRTC 30fps green-channel photoplethysmography (rPPG) for resting HR, HRV (RMSSD), and respiratory rate, plus CIE L*a*b* palpebral conjunctiva erythema (anemia proxy) and scleral b* yellowness index.</p>
+          <div class="lab-metrics">
+            <span class="metric-chip">BPM &amp; HRV RMSSD</span>
+            <span class="metric-chip">Conjunctiva a* Index</span>
+            <span class="metric-chip">Scleral b* Proxy</span>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="lab-icon">🎙️</div>
+          <h4>2. Digital Stethoscope, Voice &amp; Sonar</h4>
+          <p>Disables browser voice filters (<code>echoCancellation: false</code>) and applies BiquadFilterNode bands for Heart (20–150Hz), Lung (100–1200Hz), and Bowel sounds, plus 5s vocal jitter/shimmer/HNR and 18–22kHz sonar.</p>
+          <div class="lab-metrics">
+            <span class="metric-chip">20–1200Hz Auscultation</span>
+            <span class="metric-chip">Jitter % &amp; HNR dB</span>
+            <span class="metric-chip">18–22kHz Active Chirp</span>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="lab-icon">📈</div>
+          <h4>3. 6-Axis IMU Cardio &amp; Neuro Lab</h4>
+          <p>Uses 100Hz+ accelerometer &amp; gyroscope telemetry on the sternum for Seismocardiography (SCG) aortic valve timing, outstretched-hand FFT tremor classification (4–12Hz), and 2D Romberg sway quotient.</p>
+          <div class="lab-metrics">
+            <span class="metric-chip">Sternum SCG + PTT</span>
+            <span class="metric-chip">4–12Hz Tremor FFT</span>
+            <span class="metric-chip">Romberg Sway Quotient</span>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="lab-icon">✍️</div>
+          <h4>4. 240Hz Touch &amp; Display Neuro Lab</h4>
+          <p>High-frequency capacitive touch digitizer tests: live radial-deviation Archimedes Spiral drawing test, 10-second alternating two-finger bradykinesia tap test, Critical Flicker Fusion strobe, and Pupil Flash reflex.</p>
+          <div class="lab-metrics">
+            <span class="metric-chip">Archimedes Spiral RMS</span>
+            <span class="metric-chip">Bradykinesia Tap Rhythm</span>
+            <span class="metric-chip">Pupil Constriction ms</span>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="lab-icon">🎧</div>
+          <h4>5. Pure-Tone &amp; Weber Bone-Conduction</h4>
+          <p>Synthesizes calibrated 250–8000Hz pure tones for Left/Right ear threshold screening, paired with a guided forehead Weber vibration/acoustic lateralization test to help clinicians distinguish conductive vs. sensorineural patterns.</p>
+          <div class="lab-metrics">
+            <span class="metric-chip">250–8000Hz Audiogram</span>
+            <span class="metric-chip">Weber Midline / Lateralization</span>
+          </div>
+        </div>
+
+        <div class="lab-card" style="background:linear-gradient(135deg, rgba(0,242,254,0.1), rgba(16,185,129,0.1));border-color:var(--border-accent);">
+          <div class="lab-icon">📲</div>
+          <h4>iOS &amp; Android Capacitor Native Bridge</h4>
+          <p>Ready for Google Play &amp; Apple App Store packaging via Capacitor 6—unlocking CoreHaptics 128Hz neurological tuning-fork emulation, locked camera white-balance/ISO, and 200Hz CoreMotion IMU streams.</p>
+          <div class="lab-metrics">
+            <span class="metric-chip">Capacitor 6 Ready</span>
+            <span class="metric-chip">128Hz Haptic Fork</span>
+            <span class="metric-chip">Guideline 1.4.1 Safe</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sample Doctor Handoff PDF Preview -->
+  <section id="handoff-pdf">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Clinician Pre-Visit Deliverable</span>
+        <h2>Preview the 1-Page Structured Doctor Handoff Report</h2>
+        <p>Instead of arriving at a 10-minute telehealth video call or walk-in clinic with vague memories, patients hand their clinician a structured physiological baseline &amp; symptom summary.</p>
+      </div>
+
+      <div class="pdf-preview-shell">
+        <div class="pdf-sheet">
+          <div class="pdf-header">
+            <div>
+              <div class="pdf-title">HOME TRIAGE TRICORDER — PRE-VISIT CLINICIAN HANDOFF SUMMARY</div>
+              <div class="pdf-sub">Patient Self-Recorded Smartphone Multi-Sensor Baseline &amp; Symptom Intake · Non-Diagnostic Pre-Visit Observation</div>
+            </div>
+            <div style="text-align:right;font-size:0.78rem;color:#334155;" class="mono">
+              <strong>Report ID:</strong> HTT-2026-1028<br>
+              <strong>Signal Mode:</strong> On-Device WebRTC/IMU
+            </div>
+          </div>
+
+          <div style="background:#f1f5f9;border-left:4px solid #0284c7;padding:10px 14px;margin-bottom:16px;font-size:0.84rem;">
+            <strong>Primary Complaint Preset:</strong> Dizziness / Lightheadedness / Unsteady Balance (Onset: 48h · Step-1 Emergency Red-Flags: <strong>Cleared / Negative</strong>)
+          </div>
+
+          <div class="pdf-grid">
+            <div class="pdf-box">
+              <div class="pdf-box-title">Optical rPPG Vitals (Face)</div>
+              <div class="pdf-box-val">74 BPM · HRV 38 ms</div>
+              <div class="pdf-box-note">+4.2% vs Personal Baseline (71 BPM)</div>
+            </div>
+            <div class="pdf-box">
+              <div class="pdf-box-title">Eyelid &amp; Sclera Colorimetry</div>
+              <div class="pdf-box-val">Hgb Proxy 13.8 · Bilirubin 0.8</div>
+              <div class="pdf-box-note">Within Personal Baseline Range</div>
+            </div>
+            <div class="pdf-box">
+              <div class="pdf-box-title">Vocal Biomarkers ("Ahhh" 5s)</div>
+              <div class="pdf-box-val">Jitter 0.58% · HNR 21.4 dB</div>
+              <div class="pdf-box-note">Clear phonation stability</div>
+            </div>
+            <div class="pdf-box">
+              <div class="pdf-box-title">6-Axis IMU Hand Tremor FFT</div>
+              <div class="pdf-box-val">8.4 Hz Peak · 0.16g RMS</div>
+              <div class="pdf-box-note">Physiological 8–12Hz band</div>
+            </div>
+            <div class="pdf-box">
+              <div class="pdf-box-title">Romberg Sway (Eyes Closed/Open)</div>
+              <div class="pdf-box-val">Quotient 1.62 · 21 mm</div>
+              <div class="pdf-box-note" style="color:#d97706;">+18% sway drift vs Baseline (Review)</div>
+            </div>
+            <div class="pdf-box">
+              <div class="pdf-box-title">Weber Lateralization &amp; Spiral</div>
+              <div class="pdf-box-val">Midline · Spiral 91/100</div>
+              <div class="pdf-box-note">No conductive lateralization</div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #cbd5e1;padding-top:12px;font-size:0.75rem;color:#64748b;">
+            <span>Generated 100% locally on patient device. For clinician review alongside standard physical examination.</span>
+            <a href="./app/index.html" style="color:#0284c7;font-weight:700;">Generate Your Live PDF in App →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Two-Track Pricing Section -->
+  <section id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Transparent Two-Track Pricing</span>
+        <h2>Built for Families at Home &amp; Telehealth Clinics</h2>
+        <p>Start free in your browser right now, unlock the Early-Adopter Family Lifetime Pass &amp; Doctor Handoff PDFs for a one-time $29.99 (<s>$79/yr</s> — no subscription), or deploy a white-label pre-visit intake link for your clinic.</p>
+      </div>
+
+      <!-- Track 1: B2C -->
+      <div class="pricing-track-label">🏠 Track 1 — For Individuals, Families &amp; Caregivers (B2C)</div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div>
+            <div class="price-tier">Free Personal Baseline</div>
+            <div class="price-amount">$0 <span>/ forever in browser</span></div>
+            <div class="price-desc">Instant access to the 60-second checkup scan and emergency red-flag symptom triage.</div>
+            <ul class="feature-list">
+              <li>Full 60-Second 5-Stage General Checkup Scan</li>
+              <li>1 Local Personal Baseline saved on-device</li>
+              <li>Step-1 Emergency Red-Flag Triage Screen</li>
+              <li>Interactive Demo &amp; Hybrid Hardware Signal Mode</li>
+            </ul>
+          </div>
+          <a href="./app/index.html" class="btn btn-secondary" style="width:100%;">Launch Free Web App</a>
+        </div>
+
+        <div class="price-card featured">
+          <span class="popular-pill">Most Popular · Early-Adopter Lifetime Pass (No Subscription)</span>
+          <div>
+            <div class="price-tier">Family Baseline &amp; Doctor Handoff Pro Unlock</div>
+            <div class="price-amount"><s style="font-size:1.15rem;color:#64748b;font-weight:500;margin-right:6px;">$79/yr</s>$29.99 <span>USD one-time unlock</span></div>
+            <div class="price-desc">Covers up to 5 family members (~$6/person for life). Zero recurring fees — track your family's physiological baseline over time and bring structured PDFs to every appointment.</div>
+            <ul class="feature-list">
+              <li><strong>Unlimited Family Profiles</strong> (Kids, Spouse &amp; Aging Parents)</li>
+              <li><strong>Longitudinal % Drift Charts</strong> across HR, HRV, Voice, Tremor &amp; Balance</li>
+              <li><strong>Unlimited 1-Tap Printable Doctor Handoff PDFs</strong> for walk-in &amp; telehealth visits</li>
+              <li>Full access to all 5 <strong>Doctor's Black Bag</strong> live sensor labs</li>
+              <li>Includes downloadable offline single-file HTML bundle</li>
+            </ul>
+          </div>
+          <a id="b2c-pro-checkout-btn" href="https://buy.stripe.com/14A28qapz5nmeUG9hMd3i0e" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;">Unlock Family &amp; Doctor PDF Pro — $29.99 One-Time</a>
+        </div>
+      </div>
+
+      <!-- Track 2: B2B Clinics -->
+      <div id="pricing-b2b" class="pricing-track-label" style="margin-top:48px;">🏥 Track 2 — For Telehealth, Direct Primary Care (DPC) &amp; Jane App / Practice Better Clinics (B2B)</div>
+      <div class="pricing-grid-b2b">
+        <div class="price-card">
+          <div>
+            <div class="price-tier">14-Day Free Clinic Pilot</div>
+            <div class="price-amount">$0 <span>/ 14-day split test</span></div>
+            <div class="price-desc">Test pre-visit smartphone sensor intake with your telehealth patients before paying a cent.</div>
+            <ul class="feature-list">
+              <li>Pre-visit patient link to text 10 mins before video calls</li>
+              <li>Up to 25 patient Doctor Handoff PDFs included</li>
+              <li>Zero EHR integration required (patient uploads/emails PDF)</li>
+              <li>100% on-device processing (zero clinic PHI server liability)</li>
+            </ul>
+          </div>
+          <a href="mailto:brettducross@gmail.com?subject=14-Day%20Clinic%20Pilot%20—%20Home%20Triage%20Tricorder" class="btn btn-outline" style="width:100%;">Request 14-Day Free Clinic Pilot</a>
+        </div>
+
+        <div class="price-card featured">
+          <span class="popular-pill">Clinic Best Value</span>
+          <div>
+            <div class="price-tier">Solo Practitioner Plan</div>
+            <div class="price-amount">$99 <span>USD / month</span></div>
+            <div class="price-desc">Ideal for independent DPC doctors, telehealth practitioners, and naturopathic/functional clinicians.</div>
+            <ul class="feature-list">
+              <li>Custom white-label subdomain (<code>scan.yourclinic.com</code>)</li>
+              <li>Custom clinic name, logo &amp; header on every Doctor Handoff PDF</li>
+              <li><strong>Unlimited patient pre-visit sensor scans &amp; PDFs</strong></li>
+              <li>Ready-made SMS/email reminder templates for Jane App &amp; Doxy.me</li>
+            </ul>
+          </div>
+          <a href="mailto:brettducross@gmail.com?subject=Solo%20Practitioner%20Plan%20($99/mo)%20—%20Home%20Triage%20Tricorder" class="btn btn-emerald" style="width:100%;">Start Solo Clinic Plan ($99/mo)</a>
+        </div>
+
+        <div class="price-card">
+          <div>
+            <div class="price-tier">Multi-Provider Clinic Plan</div>
+            <div class="price-amount">$299 <span>USD / month</span></div>
+            <div class="price-desc">Built for multi-clinician telehealth practices, DPC groups, and integrative clinics.</div>
+            <ul class="feature-list">
+              <li>Up to <strong>10 clinicians</strong> with individual intake links</li>
+              <li>Custom specialty symptom presets (Cardio, Neuro, ENT, Functional)</li>
+              <li>Jane App / Practice Better / SimplePractice chart-upload workflow</li>
+              <li>Priority onboarding &amp; custom branding setup</li>
+            </ul>
+          </div>
+          <a href="mailto:brettducross@gmail.com?subject=Multi-Provider%20Clinic%20Plan%20($299/mo)%20—%20Home%20Triage%20Tricorder" class="btn btn-secondary" style="width:100%;">Book Multi-Provider Setup ($299/mo)</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Regulatory & Privacy Safe-Harbor Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="emergency-strip">
+        🚨 <strong>MEDICAL EMERGENCY NOTICE:</strong> Never use this web application in a medical emergency. If you or someone near you is experiencing chest pain, severe shortness of breath, stroke symptoms (FAST), severe bleeding, or a mental health crisis, call <strong>9-1-1</strong> immediately. HealthLink BC 24/7 Nurse Line: <strong>8-1-1</strong> · Poison Control: <strong>1-800-567-8911</strong> · Suicide Crisis Helpline: <strong>9-8-8</strong>.
+      </div>
+
+      <div class="safe-harbor-box">
+        <strong style="color:var(--amber);display:block;margin-bottom:6px;">⚖️ Regulatory Safe-Harbor &amp; 100% On-Device Privacy Statement</strong>
+        <p>
+          <strong>Home Triage Tricorder</strong> is a <strong>Multi-Sensor Personal Physiological Baseline Tracker &amp; Administrative Pre-Visit Clinician Handoff Intake Tool</strong> positioned under General Wellness and Pre-Visit Intake guidelines. It is <strong>not</strong> a regulated medical device, does not diagnose, treat, cure, or rule out any disease or medical condition, and does not replace a licensed physician's evaluation. All camera rPPG, microphone acoustic spectrograms, 6-axis IMU motion waveforms, and touch digitizer measurements execute <strong>100% locally in your browser's client-side sandbox</strong> (WebRTC, WebAudio API, HTML5 Canvas, and localStorage)—zero raw video, voice recordings, or personal health data are transmitted to external cloud servers.
+        </p>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;padding-top:12px;border-top:1px solid rgba(148,163,184,0.1);">
+        <div>
+          <strong style="color:var(--text-primary);">Home Triage Tricorder v1.0</strong> · Multi-Sensor Smartphone Physical Exam &amp; Pre-Visit Triage Studio
+        </div>
+        <div style="display:flex;gap:20px;">
+          <a href="./app/index.html" style="color:var(--cyan);">Launch Web App (/app/)</a>
+          <a href="./Home_Triage_Tricorder_App.html" download="Home_Triage_Tricorder_App.html" style="color:var(--cyan);">Download Offline HTML</a>
+          <a href="#pricing" style="color:var(--text-secondary);">Pricing</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

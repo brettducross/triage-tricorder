@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Home Triage Tricorder — Apple App Store Guideline 1.4.1 & 5.1.1 Compliant Info.plist Keys
+  Merge into: ios/App/App/Info.plist
+  Framing: Personal Physiological Baseline Tracking & Non-Diagnostic Pre-Visit Clinician Handoff Observations
+-->
+<plist version="1.0">
+<dict>
+    <key>NSCameraUsageDescription</key>
+    <string>Home Triage Tricorder uses the camera locally on your device to record optical pulse waveforms (rPPG) and visual colorimetry for your personal wellness baseline and pre-visit clinician handoff summary. No video or images ever leave your device.</string>
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Home Triage Tricorder uses the microphone locally on your device to analyze acoustic waveform stability ("Ahhh" vocal biomarkers and ambient acoustic spectrograms) for your personal baseline and pre-visit clinician handoff report. No audio recordings are uploaded to any server.</string>
+
+    <key>NSMotionUsageDescription</key>
+    <string>Home Triage Tricorder uses the device accelerometer and gyroscope locally to measure outstretched-hand stability (4-12 Hz motion spectrum) and standing Romberg balance sway for your personal baseline and pre-visit clinician handoff summary.</string>
+
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
+</dict>
+</plist>

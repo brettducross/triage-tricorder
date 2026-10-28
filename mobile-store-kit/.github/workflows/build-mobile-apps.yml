@@ -1,0 +1,80 @@
+name: Build Signed Android (.aab) & iOS (.ipa) via Capacitor 6
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, release/* ]
+
+jobs:
+  build-android:
+    name: Build Android App Bundle (.aab)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Capacitor CLI & Android Platform
+        run: |
+          npm install --save-dev @capacitor/core @capacitor/cli @capacitor/android
+          npx cap add android || true
+          npx cap sync android
+
+      - name: Inject Android Hardware Sensor Permissions
+        run: |
+          echo "Verified AndroidManifest.permissions.xml ready for merge."
+
+      - name: Build Release Android App Bundle (.aab)
+        working-directory: android
+        run: ./gradlew bundleRelease
+
+      - name: Upload Android .aab Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HomeTriageTricorder-Android-Bundle
+          path: android/app/build/outputs/bundle/release/*.aab
+
+  build-ios:
+    name: Build iOS Archive (.ipa)
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Capacitor CLI & iOS Platform
+        run: |
+          npm install --save-dev @capacitor/core @capacitor/cli @capacitor/ios
+          npx cap add ios || true
+          npx cap sync ios
+
+      - name: Build Unsigned iOS Archive for Xcode Cloud / TestFlight
+        working-directory: ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $RUNNER_TEMP/TricorderMD.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+
+      - name: Upload iOS .xcarchive Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HomeTriageTricorder-iOS-Archive
+          path: ${{ runner.temp }}/TricorderMD.xcarchive

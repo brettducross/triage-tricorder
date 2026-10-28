@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Home Triage Tricorder — Capacitor 6 Android Permissions & Hardware Features
+  Merge into: android/app/src/main/AndroidManifest.xml
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tricordermd.app">
+
+    <!-- Optical Camera rPPG, Palpebral Conjunctiva/Sclera Colorimetry & LED Torch Reflex -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <!-- Raw Unfiltered Microphone Auscultation (20-1200 Hz) & Vocal Biomarkers ("Ahhh") -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- High-Frequency 6-Axis IMU (SCG, 4-12 Hz Tremor FFT, Romberg Balance Sway) & Haptics -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
+
+    <!-- Optional Network / In-App Purchase Validation -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Hardware declarations (required="false" so tablets/devices without flash still install) -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="false" />
+
+</manifest>

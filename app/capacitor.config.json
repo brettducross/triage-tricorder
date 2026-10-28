@@ -1,0 +1,37 @@
+{
+  "appId": "com.ducross.triagetricorder",
+  "appName": "Triage Tricorder",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "capacitor"
+  },
+  "plugins": {
+    "TrueDepthNIR": {
+      "enabled": true,
+      "frameRate": 60,
+      "subcutaneousPerfusionMap": true
+    },
+    "LiDARDepthMesh": {
+      "enabled": true,
+      "precisionMm": 0.5,
+      "bodyPoseSkeleton3D": true
+    },
+    "CoreHaptics128Hz": {
+      "enabled": true,
+      "calibratedTuningForkHz": 128.0,
+      "weberBoneConduction": true
+    },
+    "CameraRAW": {
+      "enabled": true,
+      "disableAutoToneMapping": true,
+      "bayer12Bit": true
+    },
+    "TrueToneSpectralALS": {
+      "enabled": true,
+      "ambientColorTemperatureK": true,
+      "spectralChannels": 8
+    }
+  }
+}
