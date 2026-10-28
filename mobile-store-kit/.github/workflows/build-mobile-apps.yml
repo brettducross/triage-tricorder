@@ -1,4 +1,4 @@
-name: Build Signed Android (.aab) & iOS (.ipa) via Capacitor 6
+name: Build Android (.apk + .aab) & iOS Capacitor Apps
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-android:
-    name: Build Android App Bundle (.aab)
+    name: Build Android APK (Sideload) & AAB (Play Store)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -18,35 +18,42 @@ jobs:
         with:
           node-version: 20
 
-      - name: Setup Java JDK 17
+      - name: Setup Java JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Install Capacitor CLI & Android Platform
         run: |
-          npm install --save-dev @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core@^6.0.0 @capacitor/cli@^6.0.0 @capacitor/android@^6.0.0
           npx cap add android || true
           npx cap sync android
 
       - name: Inject Android Hardware Sensor Permissions
         run: |
-          echo "Verified AndroidManifest.permissions.xml ready for merge."
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            sed -i 's|</manifest>|  <uses-permission android:name="android.permission.CAMERA" />\n  <uses-permission android:name="android.permission.RECORD_AUDIO" />\n  <uses-permission android:name="android.permission.VIBRATE" />\n  <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />\n</manifest>|' "$MANIFEST"
+          fi
 
-      - name: Build Release Android App Bundle (.aab)
+      - name: Build Direct-Install Android APK & Play Store AAB Bundle
         working-directory: android
-        run: ./gradlew bundleRelease
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug bundleRelease
 
-      - name: Upload Android .aab Artifact
+      - name: Upload Android APK & AAB Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: HomeTriageTricorder-Android-Bundle
-          path: android/app/build/outputs/bundle/release/*.aab
+          name: HomeTriageTricorder-Android-APK-and-AAB
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/bundle/release/*.aab
 
   build-ios:
-    name: Build iOS Archive (.ipa)
-    runs-on: macos-14
+    name: Build iOS Capacitor Project Bundle
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -56,25 +63,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Capacitor CLI & iOS Platform
+      - name: Generate & Sync Capacitor iOS Project
         run: |
-          npm install --save-dev @capacitor/core @capacitor/cli @capacitor/ios
+          npm install @capacitor/core@^6.0.0 @capacitor/cli@^6.0.0 @capacitor/ios@^6.0.0
           npx cap add ios || true
           npx cap sync ios
 
-      - name: Build Unsigned iOS Archive for Xcode Cloud / TestFlight
-        working-directory: ios/App
-        run: |
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath $RUNNER_TEMP/TricorderMD.xcarchive \
-            CODE_SIGNING_ALLOWED=NO \
-            archive
-
-      - name: Upload iOS .xcarchive Artifact
+      - name: Upload Synced iOS Xcode Workspace Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: HomeTriageTricorder-iOS-Archive
-          path: ${{ runner.temp }}/TricorderMD.xcarchive
+          name: HomeTriageTricorder-iOS-Xcode-Workspace
+          path: ios/

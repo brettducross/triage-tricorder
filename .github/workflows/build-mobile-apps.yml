@@ -1,0 +1,76 @@
+name: Build Android (.apk + .aab) & iOS Capacitor Apps
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, release/* ]
+
+jobs:
+  build-android:
+    name: Build Android APK (Sideload) & AAB (Play Store)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install Capacitor CLI & Android Platform
+        run: |
+          npm install @capacitor/core@^6.0.0 @capacitor/cli@^6.0.0 @capacitor/android@^6.0.0
+          npx cap add android || true
+          npx cap sync android
+
+      - name: Inject Android Hardware Sensor Permissions
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            sed -i 's|</manifest>|  <uses-permission android:name="android.permission.CAMERA" />\n  <uses-permission android:name="android.permission.RECORD_AUDIO" />\n  <uses-permission android:name="android.permission.VIBRATE" />\n  <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />\n</manifest>|' "$MANIFEST"
+          fi
+
+      - name: Build Direct-Install Android APK & Play Store AAB Bundle
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug bundleRelease
+
+      - name: Upload Android APK & AAB Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: HomeTriageTricorder-Android-APK-and-AAB
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/bundle/release/*.aab
+
+  build-ios:
+    name: Build iOS Capacitor Project Bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate & Sync Capacitor iOS Project
+        run: |
+          npm install @capacitor/core@^6.0.0 @capacitor/cli@^6.0.0 @capacitor/ios@^6.0.0
+          npx cap add ios || true
+          npx cap sync ios
+
+      - name: Upload Synced iOS Xcode Workspace Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HomeTriageTricorder-iOS-Xcode-Workspace
+          path: ios/

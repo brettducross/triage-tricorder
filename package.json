@@ -1,0 +1,16 @@
+{
+  "name": "home-triage-tricorder",
+  "version": "1.0.0",
+  "description": "AI-Guided Smartphone Physical Exam & Clinical Triage Suite (PWA + Capacitor Native Bridge)",
+  "scripts": {
+    "cap:sync": "npx cap sync",
+    "cap:ios": "npx cap open ios",
+    "cap:android": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}

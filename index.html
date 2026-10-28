@@ -6,6 +6,17 @@
   <meta name="theme-color" content="#060b14" />
   <title>Home Triage Tricorder — Multi-Sensor Smartphone Physical Exam & Pre-Visit Triage Studio</title>
   <meta name="description" content="Turn any smartphone into a multi-sensor physical exam & pre-visit clinical triage studio with zero extra hardware. Camera rPPG, raw mic auscultation, 6-axis IMU SCG & tremor, 240Hz touch neuro, and Weber audiometry." />
+  <link rel="canonical" href="https://brettducross.github.io/triage-tricorder/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Home Triage Tricorder" />
+  <meta property="og:title" content="Home Triage Tricorder — Multi-Sensor Smartphone Physical Exam & Pre-Visit Triage Studio" />
+  <meta property="og:description" content="Turn any smartphone into a multi-sensor physical exam & pre-visit clinical triage studio with zero extra hardware. Camera rPPG, raw mic auscultation, 6-axis IMU SCG & tremor, 240Hz touch neuro, and 1-page Doctor Handoff PDF." />
+  <meta property="og:url" content="https://brettducross.github.io/triage-tricorder/" />
+  <meta property="og:image" content="https://brettducross.github.io/triage-tricorder/ui-screens/interactive-3-updated-4phone-board.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Home Triage Tricorder — Multi-Sensor Smartphone Physical Exam Studio" />
+  <meta name="twitter:description" content="60-second camera rPPG, raw mic auscultation, 6-axis IMU tremor/Romberg, 240Hz neuro & 1-page Doctor Handoff PDF." />
+  <meta name="twitter:image" content="https://brettducross.github.io/triage-tricorder/ui-screens/interactive-3-updated-4phone-board.png" />
   <link rel="icon" type="image/svg+xml" href="./app/icons/icon.svg" />
   <style>
     :root {
@@ -29,6 +40,10 @@
       --radius-xl: 20px;
       --radius-lg: 16px;
       --radius-md: 12px;
+      --accent-primary: #0ea5e9;
+      --accent-secondary: #10b981;
+      --btn-radius: 12px;
+      --layout-mode: split;
       --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
       --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", Menlo, Consolas, monospace;
     }
@@ -1317,5 +1332,26 @@
     </div>
   </footer>
 
+  <script type="module">
+    import { applyUIConfig, loadUIConfig, saveUIConfig, THEME_PRESETS } from './app/src/theme-config.js';
+    let cfg = applyUIConfig(loadUIConfig());
+    const navActions = document.querySelector('.nav-actions');
+    if (navActions && !document.getElementById('siteThemeSwitchBtn')) {
+      const btn = document.createElement('button');
+      btn.id = 'siteThemeSwitchBtn';
+      btn.type = 'button';
+      btn.className = 'btn btn-secondary';
+      btn.style.cssText = 'padding:8px 12px;font-size:0.78rem;cursor:pointer;';
+      const keys = Object.keys(THEME_PRESETS);
+      btn.textContent = '🎨 Theme';
+      btn.title = 'Cycle Color Scheme (Sci-Fi Cyan / Clinical Daylight / Night Amber / Bio Emerald)';
+      btn.onclick = () => {
+        const nextIdx = (keys.indexOf(cfg.theme) + 1) % keys.length;
+        cfg = saveUIConfig({ ...cfg, theme: keys[nextIdx] });
+        btn.textContent = '🎨 ' + THEME_PRESETS[cfg.theme].label.split(' ')[1];
+      };
+      navActions.prepend(btn);
+    }
+  </script>
 </body>
 </html>

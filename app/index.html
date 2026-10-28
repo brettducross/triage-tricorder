@@ -8,6 +8,21 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Tricorder MD" />
   <title>Home Triage Tricorder — AI Smartphone Physical Exam Suite</title>
+  <meta name="description" content="Guided 60-Second Head-to-Toe Baseline Scan, Dynamic Symptom Triage, 5-Lab Smartphone Physical Exam Suite & 1-Page Doctor Handoff PDF." />
+  <link rel="canonical" href="https://brettducross.github.io/triage-tricorder/app/index.html" />
+
+  <!-- OpenGraph & Twitter Card Meta Tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Home Triage Tricorder" />
+  <meta property="og:title" content="Home Triage Tricorder — AI Smartphone Physical Exam & Pre-Visit Triage Suite" />
+  <meta property="og:description" content="Run a 60-second camera rPPG, raw mic stethoscope, 6-axis IMU tremor/Romberg, and 240Hz neuro checkup in your browser. Track up to 5 family baselines & export 1-page Doctor Handoff PDFs." />
+  <meta property="og:url" content="https://brettducross.github.io/triage-tricorder/app/index.html" />
+  <meta property="og:image" content="https://brettducross.github.io/triage-tricorder/ui-screens/interactive-3-updated-4phone-board.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Home Triage Tricorder — AI Smartphone Physical Exam Suite" />
+  <meta name="twitter:description" content="60-second camera rPPG, raw mic auscultation, 6-axis IMU tremor/Romberg & 1-page Doctor Handoff PDF." />
+  <meta name="twitter:image" content="https://brettducross.github.io/triage-tricorder/ui-screens/interactive-3-updated-4phone-board.png" />
+
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
@@ -30,19 +45,30 @@
         </div>
       </div>
 
-      <div class="sim-toggle-wrap" title="Toggle between Live Hardware Sensors and Physiological Demo Waveforms for instant desktop/mobile testing">
-        <span class="sim-toggle-label" id="signalModeLabel">Signal: Hybrid Live + Sim Fallback</span>
-        <button id="simModeToggle" class="switch-btn active" type="button" aria-label="Toggle Demo Signal">
-          <span class="switch-ReadThumb"></span>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button id="openCustomizerBtn" class="btn btn-secondary" type="button" style="padding:7px 12px;font-size:0.76rem;">
+          🎨 Customize UI
         </button>
+        <div class="sim-toggle-wrap" title="Toggle between Live Hardware Sensors and Physiological Demo Waveforms">
+          <span class="sim-toggle-label" id="signalModeLabel">Live Hardware Sensors</span>
+          <button id="simModeToggle" class="switch-btn" type="button" aria-label="Toggle Demo Signal">
+            <span class="switch-ReadThumb"></span>
+          </button>
+        </div>
       </div>
     </header>
 
     <!-- Hardware Sensor Status Bar -->
     <div id="sensorStatusBar" class="sensor-status-bar"></div>
 
+    <!-- Live UI Customizer Drawer (Theme / Layout / Buttons) -->
+    <div id="uiCustomizerDrawer" class="ui-customizer-drawer"></div>
+
+    <!-- Prominent One-Tap Live Phone Sensor Activator + Family Member Profile Bar -->
+    <div id="liveSensorFamilyBar" class="live-family-bar"></div>
+
     <!-- Primary Navigation -->
-    <nav class="nav-tabs" role="tablist">
+    <nav id="primaryNavTabs" class="nav-tabs" role="tablist">
       <button class="nav-tab active" data-tab="home" type="button">
         <span>🏠 Home &amp; Baseline</span>
       </button>

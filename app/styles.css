@@ -1175,3 +1175,239 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   Dynamic Theme, Layout, Button & Family Profile Bar Extensions
+   ========================================================================== */
+
+:root {
+  --accent-primary: #0ea5e9;
+  --accent-secondary: #10b981;
+  --btn-radius: 8px;
+  --btn-pad-y: 10px;
+  --btn-pad-x: 16px;
+  --btn-font-size: 0.85rem;
+}
+
+.btn {
+  border-radius: var(--btn-radius, var(--radius-sm));
+  padding: var(--btn-pad-y, 10px) var(--btn-pad-x, 16px);
+  font-size: var(--btn-font-size, 0.85rem);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary, #0ea5e9), var(--sky, #0284c7));
+  border-color: var(--border-accent);
+  color: #ffffff;
+}
+
+.btn-emerald {
+  background: linear-gradient(135deg, var(--accent-secondary, #10b981), #059669);
+  color: #ffffff;
+}
+
+/* Layout Mode: Stacked (1-Column Focused Mobile/Desktop Stack) */
+body[data-layout="stacked"] .cockpit-split-grid,
+body[data-layout="stacked"] .two-door-grid,
+body[data-layout="stacked"] .camera-stage {
+  grid-template-columns: 1fr !important;
+}
+
+/* Layout Mode: Compact (High-Density Clinical Dashboard) */
+body[data-layout="compact"] .app-shell {
+  max-width: 1180px;
+  padding-top: 8px;
+}
+body[data-layout="compact"] .panel-card {
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+body[data-layout="compact"] .door-card {
+  padding: 14px 16px;
+  gap: 8px;
+}
+body[data-layout="compact"] .metrics-grid {
+  gap: 6px;
+  margin: 8px 0;
+}
+body[data-layout="compact"] .metric-box {
+  padding: 8px 10px;
+}
+
+/* Clinical Light Theme overrides for cards that had dark gradients */
+body[data-theme="clinical-light"] .top-header {
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+body[data-theme="clinical-light"] .door-card {
+  background: linear-gradient(155deg, #ffffff 0%, #f1f5f9 100%);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+body[data-theme="clinical-light"] .step-chip {
+  background: #e2e8f0;
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+body[data-theme="clinical-light"] .btn-secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+/* Live Sensor Activation + Family Member Baseline Bar */
+.live-family-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.live-sensor-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.live-sensor-activate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px;
+  border-radius: var(--btn-radius, 8px);
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border: 1px solid rgba(16, 185, 129, 0.6);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(14, 165, 233, 0.25));
+  color: var(--text-primary);
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.2);
+  transition: all 0.18s ease;
+}
+
+.live-sensor-activate-btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.live-sensor-activate-btn.armed {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border-color: #34d399;
+}
+
+.family-profile-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.family-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.family-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: var(--btn-radius, 999px);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.16s ease;
+}
+
+.family-pill.active {
+  background: rgba(14, 165, 233, 0.2);
+  color: var(--text-primary);
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.18);
+}
+
+.family-pill.locked {
+  opacity: 0.78;
+  border-style: dashed;
+}
+
+/* UI Customizer Drawer */
+.ui-customizer-drawer {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+.ui-customizer-drawer.open {
+  display: block;
+}
+
+.customizer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.customizer-group {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.customizer-group-title {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cyan);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.customizer-option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.customizer-opt-btn {
+  text-align: left;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.customizer-opt-btn.active {
+  border-color: var(--cyan);
+  background: rgba(14, 165, 233, 0.22);
+}
+
+.nav-tabs {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}

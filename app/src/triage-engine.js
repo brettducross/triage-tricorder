@@ -595,18 +595,72 @@ export function matchSymptomToPreset(queryText) {
   return best;
 }
 
-export function loadPersonalBaseline() {
+const FAMILY_PROFILES_KEY = 'tricorder_family_profiles_v1';
+const ACTIVE_PROFILE_KEY = 'tricorder_active_profile_v1';
+
+export const DEFAULT_FAMILY_PROFILES = [
+  { id: 'self', name: 'Self', icon: '🧑', proOnly: false, defaultMetrics: { bpm: 68, hrvRmssd: 46, respRate: 14, hgbEstimate: 14.2, bilirubinProxy: 0.65, pupilLatencyMs: 225, jitterPct: 0.55, hnrDb: 21.8, tremorFreqHz: 8.5, tremorRms: 0.13, swayPathMm: 15, rombergQuotient: 1.25 } },
+  { id: 'child1', name: 'Child 1', icon: '🧒', proOnly: true, defaultMetrics: { bpm: 84, hrvRmssd: 58, respRate: 18, hgbEstimate: 13.4, bilirubinProxy: 0.55, pupilLatencyMs: 215, jitterPct: 0.48, hnrDb: 22.6, tremorFreqHz: 8.8, tremorRms: 0.11, swayPathMm: 14, rombergQuotient: 1.18 } },
+  { id: 'child2', name: 'Child 2', icon: '👶', proOnly: true, defaultMetrics: { bpm: 88, hrvRmssd: 61, respRate: 19, hgbEstimate: 13.2, bilirubinProxy: 0.55, pupilLatencyMs: 212, jitterPct: 0.50, hnrDb: 22.4, tremorFreqHz: 8.9, tremorRms: 0.12, swayPathMm: 15, rombergQuotient: 1.20 } },
+  { id: 'spouse', name: 'Spouse', icon: '🧑', proOnly: true, defaultMetrics: { bpm: 66, hrvRmssd: 49, respRate: 14, hgbEstimate: 13.8, bilirubinProxy: 0.60, pupilLatencyMs: 222, jitterPct: 0.52, hnrDb: 22.2, tremorFreqHz: 8.4, tremorRms: 0.12, swayPathMm: 14, rombergQuotient: 1.21 } },
+  { id: 'parent', name: 'Aging Parent', icon: '🧓', proOnly: true, defaultMetrics: { bpm: 74, hrvRmssd: 34, respRate: 16, hgbEstimate: 13.5, bilirubinProxy: 0.72, pupilLatencyMs: 245, jitterPct: 0.68, hnrDb: 20.4, tremorFreqHz: 7.9, tremorRms: 0.18, swayPathMm: 21, rombergQuotient: 1.48 } }
+];
+
+export function getFamilyProfiles() {
   try {
-    const raw = localStorage.getItem(BASELINE_STORAGE_KEY);
+    const raw = localStorage.getItem(FAMILY_PROFILES_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  } catch (_) {}
+  return DEFAULT_FAMILY_PROFILES.map(p => ({ ...p }));
+}
+
+export function saveFamilyProfiles(profiles) {
+  try {
+    localStorage.setItem(FAMILY_PROFILES_KEY, JSON.stringify(profiles));
+  } catch (_) {}
+  return profiles;
+}
+
+export function getActiveProfileId() {
+  try {
+    return localStorage.getItem(ACTIVE_PROFILE_KEY) || 'self';
+  } catch (_) {
+    return 'self';
+  }
+}
+
+export function setActiveProfileId(profileId) {
+  try {
+    localStorage.setItem(ACTIVE_PROFILE_KEY, profileId || 'self');
+  } catch (_) {}
+  return profileId || 'self';
+}
+
+export function getActiveProfile() {
+  const id = getActiveProfileId();
+  const list = getFamilyProfiles();
+  return list.find(p => p.id === id) || list[0] || DEFAULT_FAMILY_PROFILES[0];
+}
+
+export function loadPersonalBaseline(profileId = getActiveProfileId()) {
+  try {
+    const key = profileId && profileId !== 'self' ? `${BASELINE_STORAGE_KEY}_${profileId}` : BASELINE_STORAGE_KEY;
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : null;
   } catch (_) {
     return null;
   }
 }
 
-export function savePersonalBaseline(metrics) {
+export function savePersonalBaseline(metrics, profileId = getActiveProfileId()) {
+  const activeProfile = getFamilyProfiles().find(p => p.id === profileId) || getActiveProfile();
   const payload = {
     timestamp: new Date().toISOString(),
+    profileId: activeProfile.id,
+    profileName: activeProfile.name,
     metrics: {
       bpm: metrics.bpm || 71,
       hrvRmssd: metrics.hrvRmssd || 43,
@@ -624,11 +678,8 @@ export function savePersonalBaseline(metrics) {
     }
   };
   try {
-    localStorage.setItem(BASELINE_STORAGE_KEY, JSON.stringify(payload));
-    const histRaw = localStorage.getItem(HISTORY_STORAGE_KEY);
-    const hist = histRaw ? JSON.parse(histRaw) : [];
-    hist.unshift(payload);
-    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(hist.slice(0, 20)));
+    const key = profileId && profileId !== 'self' ? `${BASELINE_STORAGE_KEY}_${profileId}` : BASELINE_STORAGE_KEY;
+    localStorage.setItem(key, JSON.stringify(payload));
   } catch (_) {}
   return payload;
 }
@@ -785,8 +836,9 @@ export function loadScanHistory() {
 
 export function saveScanHistoryItem(item) {
   try {
+    const prof = getActiveProfile();
     const list = loadScanHistory();
-    list.unshift({ timestamp: new Date().toISOString(), ...item });
+    list.unshift({ timestamp: new Date().toISOString(), profileId: prof.id, profileName: prof.name, ...item });
     localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(list.slice(0, 50)));
     return list;
   } catch (_) { return []; }

@@ -1,16 +1,19 @@
-const CACHE_NAME = 'triage-tricorder-v1';
+const CACHE_NAME = 'triage-tricorder-v2';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './manifest.json',
+  './src/theme-config.js',
   './src/native-bridge.js',
   './src/sensors.js',
   './src/triage-engine.js',
   './src/labs.js',
   './src/hud-visuals.js',
   './src/app.js',
-  './icons/icon.svg'
+  './icons/icon.svg',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {

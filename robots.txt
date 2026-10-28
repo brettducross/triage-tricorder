@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://brettducross.github.io/triage-tricorder/sitemap.xml
